@@ -12,5 +12,25 @@ EOT
     log_analytics_workspace_id = string
     name                       = string
   }))
+  validation {
+    condition = alltrue([
+      for k, v in var.sentinel_data_connector_aws_cloud_trails : (
+        length(v.name) > 0
+      )
+    ])
+    error_message = "must not be empty"
+  }
+  # --- Unconfirmed validation candidates, derived from azurerm_sentinel_data_connector_aws_cloud_trail's provider source ---
+  # Not auto-enabled: either a bespoke provider validator we can't safely translate,
+  # or a path that crosses a list-typed block (needs its own for_each wrapping).
+  # Review, translate into a real validation{} block above, and delete once confirmed.
+  # path: log_analytics_workspace_id
+  #   source:    [from workspaces.ValidateWorkspaceID] !ok
+  # path: log_analytics_workspace_id
+  #   source:    [from workspaces.ValidateWorkspaceID] err != nil
+  # path: aws_role_arn
+  #   source:    [from validate.IsARN] !ok
+  # path: aws_role_arn
+  #   source:    [from validate.IsARN] !strings.HasPrefix(v, "arn:") || strings.Count(v, ":") < 5
 }
 
